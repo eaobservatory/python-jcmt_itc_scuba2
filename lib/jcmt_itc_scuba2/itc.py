@@ -103,10 +103,13 @@ class SCUBA2ITC(object):
 
         return 1.0 / (0.9 * cos(radians(declination_deg - 19.823)))
 
-    def estimate_overhead(self, mode, time):
+    def estimate_overhead(self, mode, time, from_total=False):
         """
         Get the typical observing overhead in seconds based on a time
         in seconds.
+
+        If the "from_total" keyword argument is true then the time is assumed
+        to be a total time (including overheads).
         """
 
         mode_info = self.data.get(mode)
@@ -115,7 +118,12 @@ class SCUBA2ITC(object):
             raise Exception(
                 'Unknown SCUBA-2 observing mode: "{0}"'.format(mode))
 
-        return self.overhead * ceil(time / (mode_info.block_min * 60.0))
+        block_sec = mode_info.block_min * 60.0
+
+        if from_total:
+            block_sec += self.overhead
+
+        return self.overhead * ceil(time / block_sec)
 
     def get_modes(self):
         """
