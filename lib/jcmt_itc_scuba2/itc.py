@@ -20,25 +20,35 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
 from collections import OrderedDict
-from math import sqrt
+from math import ceil, cos, exp, radians, sqrt
 
-from .data import scuba2_modes
+from .data import scuba2_modes, scuba2_tau_relations
 
 
 class SCUBA2ITC(object):
-    def __init__(self, mode_data=None):
+    def __init__(self, mode_data=None, tau_data=None, overhead=90.0):
         """
         Construct ITC object.
 
         ITC parameters can be given via the "mode_data" argument as a
         dictionary of SCUBA2Mode objects by mode name.  Otherwise the
         default data are used.
+
+        Similarly the tau relations can be given as a dictionary of
+        TauRelation objects by (integer) wavelength.
         """
 
         if mode_data is None:
             self.data = scuba2_modes
         else:
             self.data = mode_data
+
+        if tau_data is None:
+            self.tau_relations = scuba2_tau_relations
+        else:
+            self.tau_relations = tau_data
+
+        self.overhead = overhead
 
     def calculate_time(self, mode, filter_, transmission, factor, rms):
         """
@@ -65,6 +75,47 @@ class SCUBA2ITC(object):
         param = self._get_param(mode, filter_)
 
         return ((param.tA / transmission) + param.tB) / sqrt(factor * time)
+
+    def calculate_tau(self, filter_, tau_225):
+        """
+        Calculate the opacity for the given filter.
+        """
+
+        try:
+            tau_relation = self.tau_relations[filter_]
+        except KeyError:
+            raise Exception('Unknown SCUBA-2 filter: "{0}"'.format(filter_))
+
+        return tau_relation.a * (tau_225 + tau_relation.b)
+
+    def calculate_transmission(self, airmass, tau):
+        """
+        Calculate the atmospheric transmission given the airmass
+        and the tau at the wavelength of interest.
+        """
+
+        return exp(-1.0 * airmass * tau)
+
+    def estimate_airmass(self, declination_deg):
+        """
+        Estimate average airmass for a source at a given declination.
+        """
+
+        return 1.0 / (0.9 * cos(radians(declination_deg - 19.823)))
+
+    def estimate_overhead(self, mode, time):
+        """
+        Get the typical observing overhead in seconds based on a time
+        in seconds.
+        """
+
+        mode_info = self.data.get(mode)
+
+        if mode_info is None:
+            raise Exception(
+                'Unknown SCUBA-2 observing mode: "{0}"'.format(mode))
+
+        return self.overhead * ceil(time / (mode_info.block_min * 60.0))
 
     def get_modes(self):
         """

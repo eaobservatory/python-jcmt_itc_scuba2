@@ -78,3 +78,14 @@ scuba2_modes = OrderedDict((
                 param_450=ITCParam(tA=12837, tB=-2200, c=0.00017919),
                 block_min=40)),
 ))
+
+# Tau relations: conversion from tau at 225 GHz.
+#
+#     tau_flt = A * (tau_225 + B)
+
+TauRelation = namedtuple('TauRelation', ('a', 'b'))
+
+scuba2_tau_relations = {
+    850: TauRelation(a=4.6, b=-0.00435),
+    450: TauRelation(a=26,  b=-0.01196),
+}
