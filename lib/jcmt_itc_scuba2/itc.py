@@ -23,6 +23,7 @@ from collections import OrderedDict
 from math import ceil, cos, exp, radians, sqrt
 
 from .data import scuba2_modes, scuba2_tau_relations
+from .version import version
 
 
 class SCUBA2ITC(object):
@@ -49,6 +50,13 @@ class SCUBA2ITC(object):
             self.tau_relations = tau_data
 
         self.overhead = overhead
+
+    def get_version(self):
+        """
+        Get the module version.
+        """
+
+        return version
 
     def calculate_time(self, mode, filter_, transmission, factor, rms):
         """
