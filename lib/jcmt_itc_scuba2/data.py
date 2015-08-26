@@ -52,7 +52,7 @@ scuba2_modes = OrderedDict((
      SCUBA2Mode(description='Daisy: ~3 arcmin map',
                 param_850=ITCParam(tA=189, tB=-48, c=0.248312),
                 param_450=ITCParam(tA=689, tB=-118, c=0.062124),
-                block_min=30)),
+                block_min=40)),
 
     ('pong900',
      SCUBA2Mode(description='Pong 900: 15 arcmin map',
