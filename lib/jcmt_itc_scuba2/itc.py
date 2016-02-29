@@ -1,5 +1,5 @@
 # Copyright (C) 2013 Science and Technology Facilities Council.
-# Copyright (C) 2015 East Asian Observatory
+# Copyright (C) 2015-2016 East Asian Observatory
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,6 +24,10 @@ from math import ceil, cos, exp, radians, sqrt
 
 from .data import scuba2_modes, scuba2_tau_relations
 from .version import version
+
+
+class SCUBA2ITCError(Exception):
+    pass
 
 
 class SCUBA2ITC(object):

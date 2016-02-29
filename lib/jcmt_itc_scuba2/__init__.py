@@ -1,4 +1,4 @@
-# Copyright (C) 2015 East Asian Observatory
+# Copyright (C) 2015-2016 East Asian Observatory
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -19,4 +19,4 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
 
-from .itc import SCUBA2ITC
+from .itc import SCUBA2ITC, SCUBA2ITCError
