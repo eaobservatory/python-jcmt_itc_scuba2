@@ -156,9 +156,17 @@ class SCUBA2ITC(object):
                 'Unknown SCUBA-2 observing mode: "{0}"'.format(mode))
 
         if filter_ == 850:
-            return mode_info.param_850
+            param = mode_info.param_850
 
         elif filter_ == 450:
-            return mode_info.param_450
+            param = mode_info.param_450
 
-        raise Exception('Unknown SCUBA-2 filter: "{0}"'.format(filter_))
+        else:
+            raise Exception('Unknown SCUBA-2 filter: "{0}"'.format(filter_))
+
+        if param is None:
+            raise SCUBA2ITCError(
+                'Timing parameters are not available '
+                'for this observing mode and wavelength.')
+
+        return param
