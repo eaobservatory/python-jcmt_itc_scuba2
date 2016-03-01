@@ -34,11 +34,13 @@ class ITCTestCase(TestCase):
 
         self.assertEqual(
             list(modes.keys()),
-            ['daisy', 'pong900', 'pong1800', 'pong3600', 'pong7200'])
+            ['daisy', 'pong900', 'pong1800', 'pong3600', 'pong7200',
+             'poldaisy'])
 
         for value in modes.values():
             self.assertTrue(value.startswith('Pong') or
-                            value.startswith('Daisy'))
+                            value.startswith('Daisy') or
+                            value.startswith('POL-2'))
 
     def test_calculate_rms(self):
         itc = SCUBA2ITC()
