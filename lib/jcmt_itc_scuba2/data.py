@@ -79,7 +79,7 @@ scuba2_modes = OrderedDict((
                 block_min=40)),
     ('poldaisy',
      SCUBA2Mode(description='POL-2 daisy (~3 arcmin)',
-                param_850=ITCParam(tA=763.2, tB=-41.85, c=None),
+                param_850=ITCParam(tA=763.2, tB=-64.0, c=None),
                 param_450=ITCParam(tA=4626.8, tB=-411.54, c=None),
                 block_min=40)),
 ))
