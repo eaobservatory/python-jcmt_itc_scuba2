@@ -19,11 +19,15 @@
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
-from collections import OrderedDict
+from collections import namedtuple, OrderedDict
 from math import ceil, cos, exp, radians, sqrt
 
 from .data import scuba2_modes, scuba2_tau_relations
 from .version import version
+
+
+SCUBA2ModeSummary = namedtuple(
+    'SCUBA2ModeSummary', ('description', 'pix_850', 'pix_450'))
 
 
 class SCUBA2ITCError(Exception):
@@ -262,8 +266,11 @@ class SCUBA2ITC(object):
         and calculate_rms methods.  The values are the mode descriptions.
         """
 
-        return OrderedDict(((mode, info.description)
-                            for (mode, info) in self.data.items()))
+        return OrderedDict((
+            (mode, SCUBA2ModeSummary(
+                info.description, info.pix_850, info.pix_450))
+            for (mode, info) in self.data.items()
+        ))
 
     def _get_param(self, mode, filter_):
         mode_info = self.data.get(mode)

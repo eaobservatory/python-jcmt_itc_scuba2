@@ -1,5 +1,5 @@
 # Copyright (C) 2013 Science and Technology Facilities Council.
-# Copyright (C) 2015 East Asian Observatory
+# Copyright (C) 2015-2017 East Asian Observatory
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ from collections import OrderedDict
 from unittest import TestCase
 
 from jcmt_itc_scuba2 import SCUBA2ITC
+from jcmt_itc_scuba2.itc import SCUBA2ModeSummary
 
 
 class ITCTestCase(TestCase):
@@ -38,9 +39,15 @@ class ITCTestCase(TestCase):
              'poldaisy'])
 
         for value in modes.values():
-            self.assertTrue(value.startswith('Pong') or
-                            value.startswith('Daisy') or
-                            value.startswith('POL-2'))
+            self.assertIsInstance(value, SCUBA2ModeSummary)
+
+            description = value.description
+            self.assertTrue(description.startswith('Pong') or
+                            description.startswith('Daisy') or
+                            description.startswith('POL-2'))
+
+            self.assertIsInstance(value.pix_850, float)
+            self.assertIsInstance(value.pix_450, float)
 
     def test_calculate_rms(self):
         itc = SCUBA2ITC()
