@@ -53,8 +53,9 @@ class ITCTestCase(TestCase):
         for (name, test) in test_data:
             (args, expected_result) = test
 
-            self.assertAlmostEqual(itc.calculate_rms(*args), expected_result,
-                                   delta=0.02)
+            self.assertAlmostEqual(
+                itc._calculate_rms_for_time_on_source(*args),
+                expected_result, delta=0.02)
 
     def test_calculate_time(self):
         itc = SCUBA2ITC()
@@ -67,5 +68,6 @@ class ITCTestCase(TestCase):
         for (name, test) in test_data:
             (args, expected_result) = test
 
-            self.assertAlmostEqual(itc.calculate_time(*args), expected_result,
-                                   delta=2)
+            self.assertAlmostEqual(
+                itc._calculate_time_on_source(*args),
+                expected_result, delta=2)

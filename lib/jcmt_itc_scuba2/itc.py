@@ -1,5 +1,5 @@
 # Copyright (C) 2013 Science and Technology Facilities Council.
-# Copyright (C) 2015-2016 East Asian Observatory
+# Copyright (C) 2015-2017 East Asian Observatory
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -62,9 +62,125 @@ class SCUBA2ITC(object):
 
         return version
 
-    def calculate_time(self, mode, filter_, transmission, factor, rms):
+    def calculate_total_time(
+            self, mode, filter_, tau_225, airmass, sampling_factors, rms,
+            with_extra_output=False):
         """
-        Calculate the observing time.
+        Calculate the total observing time.
+
+        (This is the time on source plus overheads.)
+        """
+
+        try:
+            (tau, transmission, extra) = \
+                self._calculate_opacity_and_transmission(tau_225, airmass)
+
+            time_src = self._calculate_time_on_source(
+                mode, filter_, transmission[filter_],
+                sampling_factors[filter_], rms)
+
+            time_tot = time_src + self._estimate_overhead(mode, time_src)
+
+            if not with_extra_output:
+                return time_tot
+
+            extra['time_src'] = time_src
+
+            # Ignore errors calculating the alternate filter RMS.
+            try:
+                filter_alt = 850 if filter_ == 450 else 450
+
+                extra['wl_alt'] = filter_alt
+                extra['rms_alt'] = self._calculate_rms_for_time_on_source(
+                    mode, filter_alt, transmission[filter_alt],
+                    sampling_factors[filter_alt], time_src)
+
+            except:
+                pass
+
+            return (time_tot, extra)
+
+        except ZeroDivisionError:
+            raise SCUBA2ITCError(
+                'Division by zero error occurred during calculation.')
+
+        except ValueError as e:
+            if e.args[0] == 'math domain error':
+                raise SCUBA2ITCError(
+                    'Negative square root error occurred during calculation.')
+            raise
+
+    def calculate_rms_for_total_time(
+            self, mode, filter_, tau_225, airmass, sampling_factors, time_tot,
+            with_extra_output=False):
+        """
+        Calculate the RMS for the given total observing time.
+        """
+
+        try:
+            (tau, transmission, extra) = \
+                self._calculate_opacity_and_transmission(tau_225, airmass)
+
+            time_src = time_tot - self._estimate_overhead(
+                mode, time_tot, from_total=True)
+
+            rms = self._calculate_rms_for_time_on_source(
+                mode, filter_, transmission[filter_],
+                sampling_factors[filter_], time_src)
+
+            if not with_extra_output:
+                return rms
+
+            extra['time_src'] = time_src
+
+            # Ignore errors calculating the alternate filter RMS.
+            try:
+                filter_alt = 850 if filter_ == 450 else 450
+
+                extra['wl_alt'] = filter_alt
+                extra['rms_alt'] = self._calculate_rms_for_time_on_source(
+                    mode, filter_alt, transmission[filter_alt],
+                    sampling_factors[filter_alt], time_src)
+
+            except:
+                pass
+
+            return (rms, extra)
+
+        except ZeroDivisionError:
+            raise SCUBA2ITCError(
+                'Division by zero error occurred during calculation.')
+
+        except ValueError as e:
+            if e.args[0] == 'math domain error':
+                raise SCUBA2ITCError(
+                    'Negative square root error occurred during calculation.')
+            raise
+
+    def _calculate_opacity_and_transmission(self, tau_225, airmass):
+        """
+        Determine tau and transmission at each wavelength.
+        """
+
+        tau = {}
+        transmission = {}
+        extra = {}
+
+        for filter_ in (850, 450):
+            tau_wl = self._calculate_opacity(filter_, tau_225)
+            tau[filter_] = tau_wl
+            extra['tau_{}'.format(filter_)] = tau_wl
+
+            transmission_wl = self._calculate_transmission(airmass, tau_wl)
+            transmission[filter_] = transmission_wl
+            extra['trans_{}'.format(filter_)] = transmission_wl
+
+        return (tau, transmission, extra)
+
+    def _calculate_time_on_source(
+            self, mode, filter_, transmission, factor, rms):
+        """
+        Calculate the on-source observing time.
 
         Parameters are observing type, wavelength (450/850), transmission,
         factor, target RMS (mJy/beam).
@@ -76,19 +192,20 @@ class SCUBA2ITC(object):
 
         return sqrttime * sqrttime / factor
 
-    def calculate_rms(self, mode, filter_, transmission, factor, time):
+    def _calculate_rms_for_time_on_source(
+            self, mode, filter_, transmission, factor, time):
         """
-        Calculate the RMS.
+        Calculate the RMS for the given time on source.
 
         Parameters are observing type, wavelength (450/850), transmission,
-        factor, observing time.
+        factor, on-source observing time.
         """
 
         param = self._get_param(mode, filter_)
 
         return ((param.tA / transmission) + param.tB) / sqrt(factor * time)
 
-    def calculate_tau(self, filter_, tau_225):
+    def _calculate_opacity(self, filter_, tau_225):
         """
         Calculate the opacity for the given filter.
         """
@@ -100,7 +217,7 @@ class SCUBA2ITC(object):
 
         return tau_relation.a * (tau_225 + tau_relation.b)
 
-    def calculate_transmission(self, airmass, tau):
+    def _calculate_transmission(self, airmass, tau):
         """
         Calculate the atmospheric transmission given the airmass
         and the tau at the wavelength of interest.
@@ -115,7 +232,7 @@ class SCUBA2ITC(object):
 
         return 1.0 / (0.9 * cos(radians(declination_deg - 19.823)))
 
-    def estimate_overhead(self, mode, time, from_total=False):
+    def _estimate_overhead(self, mode, time, from_total=False):
         """
         Get the typical observing overhead in seconds based on a time
         in seconds.
