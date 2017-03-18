@@ -217,7 +217,8 @@ class SCUBA2ITC(object):
         try:
             tau_relation = self.tau_relations[filter_]
         except KeyError:
-            raise Exception('Unknown SCUBA-2 filter: "{0}"'.format(filter_))
+            raise SCUBA2ITCError(
+                'Unknown SCUBA-2 filter: "{0}"'.format(filter_))
 
         return tau_relation.a * (tau_225 + tau_relation.b)
 
@@ -248,7 +249,7 @@ class SCUBA2ITC(object):
         mode_info = self.data.get(mode)
 
         if mode_info is None:
-            raise Exception(
+            raise SCUBA2ITCError(
                 'Unknown SCUBA-2 observing mode: "{0}"'.format(mode))
 
         block_sec = mode_info.block_min * 60.0
@@ -276,7 +277,7 @@ class SCUBA2ITC(object):
         mode_info = self.data.get(mode)
 
         if mode_info is None:
-            raise Exception(
+            raise SCUBA2ITCError(
                 'Unknown SCUBA-2 observing mode: "{0}"'.format(mode))
 
         if filter_ == 850:
@@ -286,7 +287,8 @@ class SCUBA2ITC(object):
             param = mode_info.param_450
 
         else:
-            raise Exception('Unknown SCUBA-2 filter: "{0}"'.format(filter_))
+            raise SCUBA2ITCError(
+                'Unknown SCUBA-2 filter: "{0}"'.format(filter_))
 
         if param is None:
             raise SCUBA2ITCError(
