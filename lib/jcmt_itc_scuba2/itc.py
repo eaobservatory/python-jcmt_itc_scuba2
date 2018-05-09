@@ -1,5 +1,5 @@
 # Copyright (C) 2013 Science and Technology Facilities Council.
-# Copyright (C) 2015-2017 East Asian Observatory
+# Copyright (C) 2015-2018 East Asian Observatory
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ from .version import version
 
 
 SCUBA2ModeSummary = namedtuple(
-    'SCUBA2ModeSummary', ('description', 'pix_850', 'pix_450'))
+    'SCUBA2ModeSummary', ('description', 'pix_850', 'pix_450', 'match_filt'))
 
 
 class SCUBA2ITCError(Exception):
@@ -269,7 +269,7 @@ class SCUBA2ITC(object):
 
         return OrderedDict((
             (mode, SCUBA2ModeSummary(
-                info.description, info.pix_850, info.pix_450))
+                info.description, info.pix_850, info.pix_450, info.match_filt))
             for (mode, info) in self.data.items()
         ))
 
