@@ -67,6 +67,12 @@ scuba2_modes = OrderedDict((
                 param_450=ITCParam(tA=2904, tB=-497, c=0.003500),
                 block_min=40, pix_850=6.5, pix_450=4.0, match_filt=True)),
 
+    ('pong2700',
+     SCUBA2Mode(description='Pong 2700: 45 arcmin map',
+                param_850=ITCParam(tA=1174, tB=-300, c=None),
+                param_450=ITCParam(tA=4143, tB=-709, c=None),
+                block_min=40, pix_850=6.5, pix_450=4.0, match_filt=True)),
+
     ('pong3600',
      SCUBA2Mode(description='Pong 3600: 1 degree map',
                 param_850=ITCParam(tA=1675, tB=-428, c=0.003180),

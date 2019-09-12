@@ -35,7 +35,7 @@ class ITCTestCase(TestCase):
 
         self.assertEqual(
             list(modes.keys()),
-            ['daisy', 'pong900', 'pong1800', 'pong3600', 'pong7200',
+            ['daisy', 'pong900', 'pong1800', 'pong2700', 'pong3600', 'pong7200',
              'poldaisy'])
 
         for value in modes.values():
