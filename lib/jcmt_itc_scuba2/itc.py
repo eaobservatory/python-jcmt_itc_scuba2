@@ -121,12 +121,30 @@ class SCUBA2ITC(object):
         Calculate the RMS for the given total observing time.
         """
 
+        time_src = time_tot - self._estimate_overhead(
+            mode, time_tot, from_total=True)
+
+        result = self.calculate_rms_for_time_on_source(
+            mode, filter_, tau_225, airmass, sampling_factors, time_src,
+            with_extra_output=with_extra_output)
+
+        if with_extra_output:
+            (rms, extra) = result
+
+            extra['time_src'] = time_src
+
+        return result
+
+    def calculate_rms_for_time_on_source(
+            self, mode, filter_, tau_225, airmass, sampling_factors, time_src,
+            with_extra_output=False):
+        """
+        Calculate the RMS for the given on-source observing time.
+        """
+
         try:
             (tau, transmission, extra) = \
                 self._calculate_opacity_and_transmission(tau_225, airmass)
-
-            time_src = time_tot - self._estimate_overhead(
-                mode, time_tot, from_total=True)
 
             rms = self._calculate_rms_for_time_on_source(
                 mode, filter_, transmission[filter_],
@@ -134,8 +152,6 @@ class SCUBA2ITC(object):
 
             if not with_extra_output:
                 return rms
-
-            extra['time_src'] = time_src
 
             # Ignore errors calculating the alternate filter RMS.
             try:
