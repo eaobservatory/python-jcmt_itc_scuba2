@@ -1,5 +1,5 @@
 # Copyright (C) 2013 Science and Technology Facilities Council.
-# Copyright (C) 2015-2018 East Asian Observatory
+# Copyright (C) 2015-2021 East Asian Observatory
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -94,11 +94,11 @@ scuba2_modes = OrderedDict((
 
 # Tau relations: conversion from tau at 225 GHz.
 #
-#     tau_flt = A * (tau_225 + B)
+#     tau_flt = A * (tau_225 + B + C sqrt(tau_225))
 
-TauRelation = namedtuple('TauRelation', ('a', 'b'))
+TauRelation = namedtuple('TauRelation', ('a', 'b', 'c'))
 
 scuba2_tau_relations = {
-    850: TauRelation(a=4.6, b=-0.00435),
-    450: TauRelation(a=26,  b=-0.01196),
+    850: TauRelation(a=3.71, b=-0.040, c=0.202),
+    450: TauRelation(a=23.3, b=-0.018, c=0.05),
 }

@@ -1,5 +1,5 @@
 # Copyright (C) 2013 Science and Technology Facilities Council.
-# Copyright (C) 2015-2018 East Asian Observatory
+# Copyright (C) 2015-2021 East Asian Observatory
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -220,7 +220,7 @@ class SCUBA2ITC(object):
             raise SCUBA2ITCError(
                 'Unknown SCUBA-2 filter: "{0}"'.format(filter_))
 
-        return tau_relation.a * (tau_225 + tau_relation.b)
+        return tau_relation.a * (tau_225 + tau_relation.b + tau_relation.c * sqrt(tau_225))
 
     def _calculate_transmission(self, airmass, tau):
         """
